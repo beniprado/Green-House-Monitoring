@@ -21,7 +21,7 @@ const char *htmlPage = R"rawliteral(
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Green-house Monitoring</title>
     <style>
-                body {
+        body {
             background-color: #BBE1D6;
             text-align: center;
             font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
@@ -192,7 +192,7 @@ const char *htmlPage = R"rawliteral(
         }
         
         atualizarDados();
-        setInterval(atualizarDados, 1);
+        setInterval(atualizarDados, 1000);
     </script>
 </body>
 </html>
@@ -203,7 +203,6 @@ float max_valueU = 0.0;
 
 unsigned long tempstart = 0;
 unsigned long interval = 1000;
-unsigned long millisvalue = 0;
 
 int seconds = 0;
 int minutes = 0;
@@ -218,7 +217,7 @@ void setup(){
     Serial.print("IP Address: ");
     Serial.println(IP);
 
-    String tims = String(minutes) + ":" (seconds < 10 ? "0" : "") + String(seconds);
+    tims = String(minutes) + ":" + (seconds < 10 ? "0" : "") + String(seconds);
 
     server.on("/", HTTP_GET, [](){
         String html = htmlPage;
@@ -252,7 +251,6 @@ void loop(){
         return;
     }
 
-
     // Atualiza os valores máximos
     if (t > max_valueT) {
         max_valueT = t;
@@ -260,17 +258,13 @@ void loop(){
     if (h > max_valueU) {
         max_valueU = h;
     }
-
     
-    
-    if (millisvalue - tempstart >= interval) {
-        tempstart = millisvalue;
-
-        
-        seconds++; //incrementa os segundos
+    if (millis() - tempstart >= interval) {
+        tempstart = millis();
+        seconds++; // incrementa os segundos
 
         // se passou 60 segundos, incrementa os minutos e reseta os segundos
-        if (seconds >=) { 
+        if (seconds >= 60) {
             seconds = 0;
             minutes++;
         }
