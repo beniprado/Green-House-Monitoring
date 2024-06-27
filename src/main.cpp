@@ -151,7 +151,7 @@ const char *htmlPage = R"rawliteral(
             <p id="temp_max">Max: %TEMP%&#8451;</p>
         </article>
         <article>
-            <h2 id="humititle">Humidade</h2>
+            <h2 id="humititle">Umidade</h2>
             <p id="umidade_atual">Hum: %UMIDADE%%</p>
             <p id="umidade_max">Max: %UMID%%</p>
         </article>
@@ -161,7 +161,7 @@ const char *htmlPage = R"rawliteral(
             <p id="lumimax">Max: N/A</p>
         </article>
         <article>
-            <h2 id="soiltitle">Humidade do solo</h2>
+            <h2 id="soiltitle">Umidade do solo</h2>
             <p id="soilinfo">Hsolo: N/A%</p>
             <p id="soilmax">Max: N/A%</p>
         </article>
@@ -202,9 +202,12 @@ float max_valueT = 0.0;
 float max_valueU = 0.0; 
 
 unsigned long tempstart = 0;
-unsigned long tempbutton = 2000;
+unsigned long interval = 1000;
 unsigned long millisvalue = 0;
-unsigned long tims = 0;
+
+int seconds = 0;
+int minutes = 0;
+String tims = "00:00";
 
 void setup(){
     Serial.begin(115200);
@@ -215,9 +218,11 @@ void setup(){
     Serial.print("IP Address: ");
     Serial.println(IP);
 
+    String tims = String(minutes) + ":" (seconds < 10 ? "0" : "") + String(seconds);
+
     server.on("/", HTTP_GET, [](){
         String html = htmlPage;
-        html.replace("%TIMERST%", String(tims));
+        html.replace("%TIMERST%", tims);
         html.replace("%TEMPERATURA%", String(dht.readTemperature()));
         html.replace("%TEMP%", String(max_valueT));
         html.replace("%UMIDADE%", String(dht.readHumidity()));
@@ -228,7 +233,7 @@ void setup(){
     server.on("/data", HTTP_GET, [](){
         float temperature = dht.readTemperature();
         float humidity = dht.readHumidity();
-        String json = "{\"temperature\": " + String(temperature) + ", \"humidity\": " + String(humidity) + ", \"temp_max\": " + String(max_valueT) + ", \"hum_max\": " + String(max_valueU) + ", \"timerst\": " + String(tims) + "}";
+        String json = "{\"temperature\": " + String(temperature) + ", \"humidity\": " + String(humidity) + ", \"temp_max\": " + String(max_valueT) + ", \"hum_max\": " + String(max_valueU) + ", \"timerst\": \"" + tims + "\"}";
         server.send(200, "application/json", json);
     });
 
@@ -247,13 +252,6 @@ void loop(){
         return;
     }
 
-    if (millis() - tempstart >= tempbutton) {
-        tempstart = millis(); 
-        Serial.print("Humidade: ");
-        Serial.println(h);
-        Serial.print("Temperatura: ");
-        Serial.println(t);
-    }
 
     // Atualiza os valores máximos
     if (t > max_valueT) {
@@ -263,6 +261,37 @@ void loop(){
         max_valueU = h;
     }
 
-    millisvalue = millis();
-    tims = millisvalue / 1000;
+    
+    
+    if (millisvalue - tempstart >= interval) {
+        tempstart = millisvalue;
+
+        
+        seconds++; //incrementa os segundos
+
+        // se passou 60 segundos, incrementa os minutos e reseta os segundos
+        if (seconds >=) { 
+            seconds = 0;
+            minutes++;
+        }
+    }
+
+    tims = String(minutes) + ":" + (seconds < 10 ? "0" : "") + String(seconds);
+
+    if (millis() - tempstart >= 2000) {
+        tempstart = millis(); 
+        Serial.print("Umidade: ");
+        Serial.println(h);
+        Serial.print("Temperatura: ");
+        Serial.println(t);
+        Serial.print("Temp: ");
+        Serial.print(minutes);
+        Serial.print(":");
+        if (seconds < 10) {
+            Serial.print("0");
+        }
+        Serial.println(seconds);
+        Serial.print("HTML PAGE: ");
+        Serial.println(tims);
+    }
 }
