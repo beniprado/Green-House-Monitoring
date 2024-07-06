@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -126,7 +125,7 @@
         <div id="info">
             <span id="tempodat">Tempo de Atividade</span>
             <br>
-            <span id="tim">%TIMERST%</span>
+            <span id="timerst">%TIMERST%</span>
         </div>
     </header>
     <div class="container">
@@ -136,19 +135,19 @@
             <p id="temp_max">Max: %TEMP%&#8451;</p>
         </article>
         <article>
-            <h2 id="humititle">Humidade</h2>
+            <h2 id="humititle">Umidade</h2>
             <p id="umidade_atual">Hum: %UMIDADE%%</p>
             <p id="umidade_max">Max: %UMID%%</p>
         </article>
         <article>
+            <h2 id="soiltitle">Umidade do solo</h2>
+            <p id="soilinfo">Hsolo: N/A%</p>
+            <p id="soilmax">Max: N/A%</p>
+        </article>
+          <article>
             <h2 id="lumititle">Luminosidade</h2>
             <p id="lumiinfo">Lumens: N/A</p>
             <p id="lumimax">Max: N/A</p>
-        </article>
-        <article>
-            <h2 id="soiltitle">Humidade do solo</h2>
-            <p id="soilinfo">Hsolo: N/A%</p>
-            <p id="soilmax">Max: N/A%</p>
         </article>
     </div>
     <footer>
@@ -161,29 +160,23 @@
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === XMLHttpRequest.DONE) {
                     if (xhr.status === 200) {
-                        var data = JSON.parse(xhr.responseText); // Assume que o servidor retorna dados JSON
-        
-                        // Atualiza os valores no HTML
+                        var data = JSON.parse(xhr.responseText);
                         document.getElementById('temp_atual').textContent = "Temp: " + data.temperature + "℃";
                         document.getElementById('temp_max').textContent = "Max: " + data.temp_max + "℃";
                         document.getElementById('umidade_atual').textContent = "Hum: " + data.humidity + "%";
                         document.getElementById('umidade_max').textContent = "Max: " + data.hum_max + "%";
-                        document.getElementById('tim').textContent = data.timerst;
+                        document.getElementById('timerst').textContent = data.timerst;
                     } else {
                         console.error('Erro ao carregar dados:', xhr.status);
                     }
                 }
             };
-        
             xhr.open("GET", "/data", true);
             xhr.send();
         }
         
-        // Chama a função inicialmente e define um intervalo para atualizar a cada 5 segundos (ou o intervalo desejado)
         atualizarDados();
-        setInterval(atualizarDados, 1); // Atualiza a cada 5 segundos (5000 milissegundos)
-        </script>
-        
+        setInterval(atualizarDados, 1000);
+    </script>
 </body>
 </html>
-
