@@ -250,7 +250,7 @@ void loop() {
     tims = String(minutes) + ":" + (seconds < 10 ? "0" : "") + String(seconds);
 
     // Saída Serial para debug
-    if (millis() - tempstart >= 2000) {
+    if (millis() - tempstart >= 1500) {
         tempstart = millis();
         Serial.print("Humidity: ");
         Serial.println(h);
