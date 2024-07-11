@@ -51,32 +51,34 @@ const char *htmlPage = R"rawliteral(
             <span id="timerst">%TIMERST%</span>
         </div>
     </header>
-    <div class="container">
-        <article>
-            <h2 id="temptitle">Temperatura</h2>
-            <p id="temp_atual">Temp: %TEMPERATURA%&#8451;</p>
-            <p id="temp_max">Max: %TEMP%&#8451;</p>
-        </article>
-        <article>
-            <h2 id="humititle">Umidade</h2>
-            <p id="umidade_atual">Hum: %UMIDADE%%</p>
-            <p id="umidade_max">Max: %UMID%%</p>
-        </article>
-        <article>
-            <h2 id="soiltitle">Umidade do solo</h2>
-            <p id="soilinfo">Hsolo: %HSOLO%%</p>
-            <p id="soilmax">Max: %HMAX%%</p>
-        </article>
-        <article>
-            <h2 id="lumititle">Luminosidade</h2>
-            <p id="lumiinfo">Lumens: N/A</p>
-            <p id="lumimax">Max: N/A</p>
-        </article>
-    </div>
+    <main>
+        <div class="container">
+            <article>
+                <h2 id="temptitle">Temperatura</h2>
+                <p id="temp_atual"class="atual">Temp: %TEMPERATURA%&#8451;</p>
+                <p id="temp_max">Max: %TEMP_MAX%&#8451;</p>
+                <p id="temp_min">Min: %TEMP_MIN%&#8451;</p>
+            </article>
+            <article>
+                <h2 id="humititle">Umidade</h2>
+                <p id="umidade_atual"class="atual">Hum: %UMIDADE%%</p>
+                <p id="umidade_max">Max: %UMID_MAX%%</p>
+                <p id="umidade_min">Min: %UMID_MIN%%</p>
+            </article>
+            <article>
+                <h2 id="soiltitle">Umidade do solo</h2>
+                <p id="soilinfo"class="atual">Hsolo: %HSOLO%%</p>
+            </article>
+            <article>
+                <h2 id="lumititle">Luminosidade</h2>
+                <p id="lumiinfo"class="atual">Lumens: N/A</p>
+                <p id="lumimax">Status: N/A</p>
+            </article>
+        </div>
+    </main>
     <footer>
-        <p>© 2024 Green-house Monitoring Versão 1.0</p>
+        <p>© 2024 Green-house Monitoring Versão 1.2</p><code>Feito por <a href="https://www.instagram.com/beni.prado/" style="color: white;" target="_blank">Beni</a></code>
     </footer>
-
     <script>
         function atualizarDados() {
             var xhr = new XMLHttpRequest();
@@ -86,10 +88,11 @@ const char *htmlPage = R"rawliteral(
                         var data = JSON.parse(xhr.responseText);
                         document.getElementById('temp_atual').textContent = "Temp: " + data.temperature + "℃";
                         document.getElementById('temp_max').textContent = "Max: " + data.temp_max + "℃";
+                        document.getElementById('temp_min').textContent = "Min: " + data.temp_min + "℃";
                         document.getElementById('umidade_atual').textContent = "Hum: " + data.humidity + "%";
                         document.getElementById('umidade_max').textContent = "Max: " + data.hum_max + "%";
+                        document.getElementById('umidade_min').textContent = "Min: " + data.hum_min + "%";
                         document.getElementById('soilinfo').textContent = "Hsolo: " + data.HMSOLO + "%";
-                        document.getElementById('soilmax').textContent = "Max: " + data.HMAX + "%";
                         document.getElementById('timerst').textContent = data.timerst;
                     } else {
                         console.error('Erro ao carregar dados:', xhr.status);
@@ -99,7 +102,6 @@ const char *htmlPage = R"rawliteral(
             xhr.open("GET", "/data", true);
             xhr.send();
         }
-        
         atualizarDados();
         setInterval(atualizarDados, 1000);
     </script>
@@ -108,8 +110,11 @@ const char *htmlPage = R"rawliteral(
 )rawliteral";
 
 float max_valueT = 0.0;
+float min_valueT = 100.0;  // Valor inicial alto para encontrar o mínimo
 float max_valueU = 0.0;
+float min_valueU = 100.0;  // Valor inicial alto para encontrar o mínimo
 int max_valueHS = 0;
+int min_valueHS = 100;     // Inicializado com 100 para encontrar o mínimo
 
 unsigned long tempstart = 0;
 unsigned long interval = 1000;
@@ -132,7 +137,7 @@ void setup() {
         float temperature = dht.readTemperature();
         float humidity = dht.readHumidity();
         int soilHumidity = analogRead(HMSOLO);
-        soilHumidity = map(soilHumidity, 0, 1023, 0, 100);
+        soilHumidity = map(soilHumidity, 0, 4095, 0, 100);  // Ajuste para melhorar a precisão
         
         if (isnan(temperature) || isnan(humidity) || isnan(soilHumidity)) {
             temperature = 0.0;
@@ -140,19 +145,34 @@ void setup() {
             soilHumidity = 0;
         }
         
+        // Atualiza valores máximos e mínimos
+        if (temperature > max_valueT) {
+            max_valueT = temperature;
+        }
+        if (temperature < min_valueT) {
+            min_valueT = temperature;
+        }
+        if (humidity > max_valueU) {
+            max_valueU = humidity;
+        }
+        if (humidity < min_valueU) {
+            min_valueU = humidity;
+        }
+        
         html.replace("%TIMERST%", tims);
         html.replace("%TEMPERATURA%", String(temperature));
-        html.replace("%TEMP%", String(max_valueT));
+        html.replace("%TEMP_MAX%", String(max_valueT));
+        html.replace("%TEMP_MIN%", String(min_valueT));
         html.replace("%UMIDADE%", String(humidity));
-        html.replace("%UMID%", String(max_valueU));
+        html.replace("%UMID_MAX%", String(max_valueU));
+        html.replace("%UMID_MIN%", String(min_valueU));
         
-        // Ensure soil humidity doesn't exceed 100%
+        // Garante que a umidade do solo não exceda 100%
         if (soilHumidity > 100) {
             soilHumidity = 100;
         }
         
         html.replace("%HSOLO%", String(soilHumidity));
-        html.replace("%HMAX%", String(max_valueHS));
         server.send(200, "text/html", html);
     });
 
@@ -160,7 +180,7 @@ void setup() {
         float temperature = dht.readTemperature();
         float humidity = dht.readHumidity();
         int soilHumidity = analogRead(HMSOLO);
-        soilHumidity = map(soilHumidity, 0, 1023, 0, 100);
+        soilHumidity = map(soilHumidity, 0, 4095, 0, 100);  // Ajuste para melhorar a precisão
         
         if (isnan(temperature) || isnan(humidity) || isnan(soilHumidity)) {
             temperature = 0.0;
@@ -168,21 +188,21 @@ void setup() {
             soilHumidity = 0;
         }
         
-        // Update max soil humidity value
-        if (soilHumidity > max_valueHS) {
-            if (soilHumidity > 100) {
-                max_valueHS = 100;  // Limit max_valueHS to 100%
-            } else {
-                max_valueHS = soilHumidity;
-            }
+        // Atualiza valores máximos e mínimos
+        if (temperature > max_valueT) {
+            max_valueT = temperature;
+        }
+        if (temperature < min_valueT) {
+            min_valueT = temperature;
+        }
+        if (humidity > max_valueU) {
+            max_valueU = humidity;
+        }
+        if (humidity < min_valueU) {
+            min_valueU = humidity;
         }
         
-        // Ensure soil humidity doesn't exceed 100%
-        if (soilHumidity > 100) {
-            soilHumidity = 100;
-        }
-        
-        String json = "{\"temperature\": " + String(temperature) + ", \"humidity\": " + String(humidity) + ", \"temp_max\": " + String(max_valueT) + ", \"hum_max\": " + String(max_valueU) + ", \"HMSOLO\": " + String(soilHumidity) + ", \"HMAX\": " + String(max_valueHS) + ", \"timerst\": \"" + tims + "\"}";
+        String json = "{\"temperature\": " + String(temperature) + ", \"humidity\": " + String(humidity) + ", \"temp_max\": " + String(max_valueT) + ", \"temp_min\": " + String(min_valueT) + ", \"hum_max\": " + String(max_valueU) + ", \"hum_min\": " + String(min_valueU) + ", \"HMSOLO\": " + String(soilHumidity) + ", \"HMAX\": " + String(max_valueHS) + ", \"HMIN\": " + String(min_valueHS) + ", \"timerst\": \"" + tims + "\"}";
         server.send(200, "application/json", json);
     });
 
@@ -196,29 +216,28 @@ void loop() {
     float h = dht.readHumidity();
     float t = dht.readTemperature();
     int soilHumidity = analogRead(HMSOLO);
-    soilHumidity = map(soilHumidity, 0, 1023, 0, 100);
+    soilHumidity = map(soilHumidity, 0, 4095, 0, 100);  // Ajuste para melhorar a precisão
 
     if (isnan(h) || isnan(t)) {
         Serial.println("Failed to read from DHT sensor!");
         return;
     }
 
-    // Update maximum values
+    // Atualiza valores máximos e mínimos
     if (t > max_valueT) {
         max_valueT = t;
+    }
+    if (t < min_valueT) {
+        min_valueT = t;
     }
     if (h > max_valueU) {
         max_valueU = h;
     }
-    if (soilHumidity > max_valueHS) {
-        if (soilHumidity > 100) {
-            max_valueHS = 100;  // Limit max_valueHS to 100%
-        } else {
-            max_valueHS = soilHumidity;
-        }
+    if (h < min_valueU) {
+        min_valueU = h;
     }
 
-    // Update time
+    // Atualiza tempo
     if (millis() - tempstart >= interval) {
         tempstart = millis();
         seconds++;
@@ -230,7 +249,7 @@ void loop() {
 
     tims = String(minutes) + ":" + (seconds < 10 ? "0" : "") + String(seconds);
 
-    // Serial output for debugging
+    // Saída Serial para debug
     if (millis() - tempstart >= 2000) {
         tempstart = millis();
         Serial.print("Humidity: ");
