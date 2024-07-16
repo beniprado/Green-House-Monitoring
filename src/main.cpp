@@ -6,8 +6,9 @@
 const char* ssid = "Greenhouse-Monitoring";
 const char* password = "kitkats9";
 
-#define DHTPIN 18  // DHT11 connected to pin 18
-#define HMSOLO 34  // Soil humidity connected to pin 34
+#define DHTPIN 18  // DHT11 conectado ao pino 18
+#define HMSOLO 34  // Umidade do solo conectado ao pino 34
+#define LDR 35     // LDR conectado ao pino 35
 #define DHTTYPE DHT11
 
 DHT dht(DHTPIN, DHTTYPE);
@@ -53,17 +54,17 @@ const char *htmlPage = R"rawliteral(
             <article>
                 <h2 id="soiltitle">Umidade do solo</h2>
                 <p id="soilinfo" class="atual">%HSOLO%%</p>
-                <p id="soilstatus">Status: N/A</p>
+                <p id="soilstatus">Status: %HSOLO_STATUS%</p>
             </article>
             <article>
                 <h2 id="lumititle">Luminosidade</h2>
-                <p id="lumiinfo" class="atual">Lumens: N/A</p>
-                <p id="lumimax">Status: N/A</p>
+                <p id="lumiinfo" class="atual">%LDR%%</p>
+                <p id="lumimax">Status: %LDR_STATUS%</p>
             </article>
         </div>
     </main>
     <footer>
-        <p>© 2024 Green-house Monitoring Versão 1.2</p>
+        <p>© 2024 Green-house Monitoring Versão 1.3.5</p>
         <code>Feito por <a href="https://www.instagram.com/beni.prado/" style="color: white;" target="_blank">Beni</a></code>
     </footer>
     <script>
@@ -80,6 +81,7 @@ const char *htmlPage = R"rawliteral(
                         document.getElementById('umidade_max').textContent = "Max: " + data.hum_max + "%";
                         document.getElementById('umidade_min').textContent = "Min: " + data.hum_min + "%";
                         document.getElementById('soilinfo').textContent = "" + data.HMSOLO + "%";
+                        document.getElementById('lumiinfo').textContent = "" + data.LDR + "%";
                         document.getElementById('timerst').textContent = data.timerst;
                     } else {
                         console.error('Erro ao carregar dados:', xhr.status);
@@ -113,6 +115,7 @@ void setup() {
     Serial.begin(115200);
     dht.begin();
     pinMode(HMSOLO, INPUT);
+    pinMode(LDR, INPUT);
 
     WiFi.softAP(ssid, password);
     IPAddress IP = WiFi.softAPIP();
@@ -120,16 +123,18 @@ void setup() {
     Serial.println(IP);
 
     server.on("/", HTTP_GET, []() {
-        String html = htmlPage;
         float temperature = dht.readTemperature();
         float humidity = dht.readHumidity();
-        int soilHumidity = analogRead(HMSOLO);
-        soilHumidity = map(soilHumidity, 0, 4095, 0, 100);  // Ajuste para melhorar a precisão
-        
-        if (isnan(temperature) || isnan(humidity) || isnan(soilHumidity)) {
+        int SOhumidity = analogRead(HMSOLO);
+        SOhumidity = map(SOhumidity, 0, 4095, 0, 100);
+        int LDR_V = analogRead(LDR);
+        LDR_V = map(LDR_V, 0, 1023, 0, 100);
+
+        if (isnan(temperature) || isnan(humidity) || isnan(SOhumidity) || isnan(LDR_V)){
             temperature = 0.0;
             humidity = 0.0;
-            soilHumidity = 0;
+            SOhumidity = 0;
+            LDR_V = 0;
         }
         
         // Atualiza valores máximos e mínimos
@@ -146,6 +151,7 @@ void setup() {
             min_valueU = humidity;
         }
         
+        String html = htmlPage;
         html.replace("%TIMERST%", tims);
         html.replace("%TEMPERATURA%", String(temperature));
         html.replace("%TEMP_MAX%", String(max_valueT));
@@ -153,26 +159,34 @@ void setup() {
         html.replace("%UMIDADE%", String(humidity));
         html.replace("%UMID_MAX%", String(max_valueU));
         html.replace("%UMID_MIN%", String(min_valueU));
+        html.replace("%LDR%", String(LDR_V));
         
         // Garante que a umidade do solo não exceda 100%
-        if (soilHumidity > 100) {
-            soilHumidity = 100;
+        if (SOhumidity > 100) {
+            SOhumidity = 100;
+        }
+
+        if (LDR_V > 100){
+            LDR_V = 100;
         }
         
-        html.replace("%HSOLO%", String(soilHumidity));
+        html.replace("%HSOLO%", String(SOhumidity));
         server.send(200, "text/html", html);
     });
 
     server.on("/data", HTTP_GET, []() {
         float temperature = dht.readTemperature();
         float humidity = dht.readHumidity();
-        int soilHumidity = analogRead(HMSOLO);
-        soilHumidity = map(soilHumidity, 0, 4095, 0, 100);  // Ajuste para melhorar a precisão
-        
-        if (isnan(temperature) || isnan(humidity) || isnan(soilHumidity)) {
+        int SOhumidity = analogRead(HMSOLO);
+        SOhumidity = map(SOhumidity, 0, 4095, 0, 100);
+        int LDR_V = analogRead(LDR);
+        LDR_V = map(LDR_V, 0, 1023, 0, 100);
+
+        if (isnan(temperature) || isnan(humidity) || isnan(SOhumidity) || isnan(LDR_V)) {
             temperature = 0.0;
             humidity = 0.0;
-            soilHumidity = 0;
+            SOhumidity = 0;
+            LDR_V = 0;
         }
         
         // Atualiza valores máximos e mínimos
@@ -189,7 +203,7 @@ void setup() {
             min_valueU = humidity;
         }
         
-        String json = "{\"temperature\": " + String(temperature) + ", \"humidity\": " + String(humidity) + ", \"temp_max\": " + String(max_valueT) + ", \"temp_min\": " + String(min_valueT) + ", \"hum_max\": " + String(max_valueU) + ", \"hum_min\": " + String(min_valueU) + ", \"HMSOLO\": " + String(soilHumidity) + ", \"HMAX\": " + String(max_valueHS) + ", \"HMIN\": " + String(min_valueHS) + ", \"timerst\": \"" + tims + "\"}";
+        String json = "{\"temperature\": " + String(temperature) + ", \"humidity\": " + String(humidity) + ", \"temp_max\": " + String(max_valueT) + ", \"temp_min\": " + String(min_valueT) + ", \"hum_max\": " + String(max_valueU) + ", \"hum_min\": " + String(min_valueU) + ", \"HMSOLO\": " + String(SOhumidity) + ", \"HMAX\": " + String(max_valueHS) + ", \"HMIN\": " + String(min_valueHS) + ", \"LDR\": " + String(LDR_V) + ", \"timerst\": \"" + tims + "\"}";
         server.send(200, "application/json", json);
     });
 
@@ -199,59 +213,19 @@ void setup() {
 
 void loop() {
     server.handleClient();
+    Serial.available();
 
     float h = dht.readHumidity();
     float t = dht.readTemperature();
-    int soilHumidity = analogRead(HMSOLO);
-    soilHumidity = map(soilHumidity, 0, 4095, 0, 100);  // Ajuste para melhorar a precisão
+    int SOhumidity = analogRead(HMSOLO);
+    SOhumidity = map(SOhumidity, 0, 4095, 0, 100);
+    int LDR_V = analogRead(LDR);
+    LDR_V = map(LDR_V, 0, 1023, 0, 100);
 
-    if (isnan(h) || isnan(t)) {
-        Serial.println("Failed to read from DHT sensor!");
+    if (isnan(h) || isnan(t) || isnan(SOhumidity) || isnan(LDR_V)) {
+        Serial.println("Failed to read from sensor!");
         return;
-    }
-
-    // Atualiza valores máximos e mínimos
-    if (t > max_valueT) {
-        max_valueT = t;
-    }
-    if (t < min_valueT) {
-        min_valueT = t;
-    }
-    if (h > max_valueU) {
-        max_valueU = h;
-    }
-    if (h < min_valueU) {
-        min_valueU = h;
-    }
-
-    // Atualiza tempo
-    if (millis() - tempstart >= interval) {
-        tempstart = millis();
-        seconds++;
-        if (seconds >= 60) {
-            seconds = 0;
-            minutes++;
-        }
-    }
-
-    tims = String(minutes) + ":" + (seconds < 10 ? "0" : "") + String(seconds);
-
-    // Saída Serial para debug
-    if (millis() - tempstart >= 1500) {
-        tempstart = millis();
-        Serial.print("Humidity: ");
-        Serial.println(h);
-        Serial.print("Temperature: ");
-        Serial.println(t);
-        Serial.print("Time: ");
-        Serial.print(minutes);
-        Serial.print(":");
-        if (seconds < 10) {
-            Serial.print("0");
-        }
-        Serial.println(seconds);
-        Serial.print("Soil Humidity: ");
-        Serial.print(soilHumidity);
-        Serial.println("%");
+    } else {
+        Serial.println("Successful to read from sensor!");
     }
 }

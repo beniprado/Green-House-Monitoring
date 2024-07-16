@@ -37,26 +37,33 @@
             <article>
                 <h2 id="soiltitle">Umidade do solo</h2>
                 <p id="soilinfo" class="atual">%HSOLO%%</p>
-                <p id="soilstatus">Status: N/A</p>
+                <p id="soilstatus">Status: %HSOLO_STATUS%</p>
             </article>
             <article>
                 <h2 id="lumititle">Luminosidade</h2>
-                <p id="lumiinfo" class="atual">Lumens: N/A</p>
-                <p id="lumimax">Status: N/A</p>
+                <p id="lumiinfo" class="atual">%LDR%%</p>
+                <p id="lumimax">Status: %LDR_STATUS%</p>
             </article>
         </div>
     </main>
     <footer>
-        <p>© 2024 Green-house Monitoring Versão 1.2</p>
+        <p>© 2024 Green-house Monitoring Versão 1.3</p>
         <code>Feito por <a href="https://www.instagram.com/beni.prado/" style="color: white;" target="_blank">Beni</a></code>
     </footer>
     <script>
+                // Função para atualizar os dados na página
         function atualizarDados() {
+            // Cria um novo objeto XMLHttpRequest para fazer requisições ao servidor
             var xhr = new XMLHttpRequest();
+            // Define o callback para lidar com a resposta da requisição
             xhr.onreadystatechange = function () {
+                // Verifica se a requisição foi concluída e a resposta está pronta
                 if (xhr.readyState === XMLHttpRequest.DONE) {
+                    // Verifica se a resposta foi bem-sucedida (status 200 = OK)
                     if (xhr.status === 200) {
+                        // Converte a resposta JSON em um objeto JavaScript
                         var data = JSON.parse(xhr.responseText);
+                        // Atualiza os elementos HTML com os novos dados recebidos
                         document.getElementById('temp_atual').textContent = "" + data.temperature + "℃";
                         document.getElementById('temp_max').textContent = "Max: " + data.temp_max + "℃";
                         document.getElementById('temp_min').textContent = "Min: " + data.temp_min + "℃";
@@ -64,16 +71,23 @@
                         document.getElementById('umidade_max').textContent = "Max: " + data.hum_max + "%";
                         document.getElementById('umidade_min').textContent = "Min: " + data.hum_min + "%";
                         document.getElementById('soilinfo').textContent = "" + data.HMSOLO + "%";
+                        document.getElementById('lumiinfo').textContent = "" + data.LDR + "%";
                         document.getElementById('timerst').textContent = data.timerst;
                     } else {
+                        // Se houver um erro, exibe no console do navegador
                         console.error('Erro ao carregar dados:', xhr.status);
                     }
                 }
             };
+            // Abre a conexão para enviar a requisição GET para o endpoint '/data'
             xhr.open("GET", "/data", true);
+            // Envia a requisição
             xhr.send();
         }
+        // Chama a função atualizarDados() inicialmente para carregar os dados ao carregar a página
         atualizarDados();
+        // Configura a função atualizarDados() para ser chamada a cada 1000 milissegundos (1 segundo)
+        // para atualizar os dados periodicamente
         setInterval(atualizarDados, 1000);
     </script>
 </body>
