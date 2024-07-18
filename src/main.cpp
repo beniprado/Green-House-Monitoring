@@ -22,7 +22,7 @@ const char *htmlPage = R"rawliteral(
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Green-house Monitoring</title>
     <style>
- body{background-color:#BBE1D6;text-align:center;font-family:'Lucida Sans','Lucida Sans Regular','Lucida Grande','Lucida Sans Unicode',Geneva,Verdana,sans-serif;margin:0;padding:0}header{margin-bottom:10px;padding:10px;background-color:#74DBBC;color:#315C4F}h1{margin:0;font-size:2em}div#info{padding:10px}span#tempodat{font-weight:700}span#tim{color:#193029;font-weight:700;font-size:16px}.container{display:flex;flex-wrap:wrap;justify-content:center;padding:20px}article{width:200px;padding:15px;margin:10px;border-radius:10px;background-color:#315C4F;color:#FFF;box-shadow:0 4px 8px rgba(0,0,0,0.2);transition:transform .2s}article:hover{transform:scale(1.05)}h2{font-size:1.2em;color:#74DBBC;margin-bottom:10px}p{margin:5px 0}button{padding:10px 20px;margin:20px;border:none;border-radius:5px;background-color:#74DBBC;color:#315C4F;font-size:12px;cursor:pointer;transition:background-color .3s}button:hover{background-color:#62c0a7}footer{padding:10px;background-color:#315C4F;color:#FFF;position:fixed;bottom:0;width:100%;text-align:center}.atual{display:inline-block;padding:11px;color:#74DBBC;font-weight:700;border:2px solid #193029;border-radius:4px;text-align: center;}.Min-Max{font-family:'Gill Sans','Gill Sans MT',Calibri,'Trebuchet MS',sans-serif;font-size:14px}.divmm{display:flex;flex-direction:row;justify-content:space-around;}@media screen and (max-width: 760px){body{margin:0 auto;text-align:center}.container{flex-direction:column;padding:0}article{width:70%;margin:10px auto}footer{position:static;padding:20px 0}}
+ body{background-color:#BBE1D6;text-align:center;font-family:'Lucida Sans','Lucida Sans Regular','Lucida Grande','Lucida Sans Unicode',Geneva,Verdana,sans-serif;margin:0;padding:0}header{margin-bottom:10px;padding:10px;background-color:#74DBBC;color:#315C4F}h1{margin:0;font-size:2em}div#info{padding:10px}span#tempodat{font-weight:700}span#tim{color:#193029;font-weight:700;font-size:16px}.container{display:flex;flex-wrap:wrap;justify-content:center;padding:20px}article{width:200px;padding:15px;margin:10px;border-radius:10px;background-color:#315C4F;color:#FFF;box-shadow:0 4px 8px rgba(0,0,0,0.2);transition:transform .2s}article:hover{transform:scale(1.05)}h2{font-size:1.2em;color:#74DBBC;margin-bottom:10px}p{margin:5px 0}button{padding:10px 20px;margin:20px;border:none;border-radius:5px;background-color:#74DBBC;color:#315C4F;font-size:12px;cursor:pointer;transition:background-color .3s}button:hover{background-color:#62c0a7}footer{padding:10px;background-color:#315C4F;color:#FFF;position:fixed;bottom:0;width:100%;text-align:center}.atual{display:inline-block;padding:11px;color:#74DBBC;font-weight:700;border:2px solid #193029;border-radius:4px;text-align: center;}.Min-Max{font-family:'Gill Sans','Gill Sans MT',Calibri,'Trebuchet MS',sans-serif;font-size:16px}.divmm{display:flex;flex-direction:row;justify-content:space-around;}@media screen and (max-width: 760px){body{margin:0 auto;text-align:center}.container{flex-direction:column;padding:0}article{width:70%;margin:10px auto}footer{position:static;padding:20px 0}}
     </style>
 </head>
 <body>
@@ -44,7 +44,7 @@ const char *htmlPage = R"rawliteral(
                 </div>
             </article>
             <article>
-                <h2 id="humititle">Umidade</h2>
+                <h2 id="humititle">Humidade</h2>
                 <p id="umidade_atual" class="atual">%UMIDADE%%</p>
                 <div class="divmm">
                     <p id="umidade_min" class="Min-Max">Min: %UMID_MIN%%</p>
@@ -52,7 +52,7 @@ const char *htmlPage = R"rawliteral(
                 </div>
             </article>
             <article>
-                <h2 id="soiltitle">Umidade do solo</h2>
+                <h2 id="soiltitle">Humidade do solo</h2>
                 <p id="soilinfo" class="atual">%HSOLO%%</p>
                 <p id="soilstatus">Status: %HSOLO_STATUS%</p>
             </article>
@@ -64,11 +64,11 @@ const char *htmlPage = R"rawliteral(
         </div>
     </main>
     <footer>
-        <p>© 2024 Green-house Monitoring Versão 1.3.5</p>
+        <p>© 2024 Green-house Monitoring Versão 1.4</p>
         <code>Feito por <a href="https://www.instagram.com/beni.prado/" style="color: white;" target="_blank">Beni</a></code>
     </footer>
     <script>
-        function atualizarDados() {
+                function atualizarDados() {
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === XMLHttpRequest.DONE) {
@@ -81,7 +81,9 @@ const char *htmlPage = R"rawliteral(
                         document.getElementById('umidade_max').textContent = "Max: " + data.hum_max + "%";
                         document.getElementById('umidade_min').textContent = "Min: " + data.hum_min + "%";
                         document.getElementById('soilinfo').textContent = "" + data.HMSOLO + "%";
+                        document.getElementById('soilstatus').textContent = "Status: " + data.HSOLO_STATUS;  // Atualiza o status do solo
                         document.getElementById('lumiinfo').textContent = "" + data.LDR + "%";
+                        document.getElementById('lumimax').textContent = "Status: " + data.LDR_STATUS;  // Atualiza o status da luminosidade
                         document.getElementById('timerst').textContent = data.timerst;
                     } else {
                         console.error('Erro ao carregar dados:', xhr.status);
@@ -126,9 +128,9 @@ void setup() {
         float temperature = dht.readTemperature();
         float humidity = dht.readHumidity();
         int SOhumidity = analogRead(HMSOLO);
-        SOhumidity = map(SOhumidity, 0, 4095, 0, 100);
+        SOhumidity = map(SOhumidity, 0, 4095, 100, 0); // Corrigido para reverter os valores
         int LDR_V = analogRead(LDR);
-        LDR_V = map(LDR_V, 0, 1023, 0, 100);
+        LDR_V = map(LDR_V, 0, 4095, 0, 100);
 
         if (isnan(temperature) || isnan(humidity) || isnan(SOhumidity) || isnan(LDR_V)){
             temperature = 0.0;
@@ -149,83 +151,130 @@ void setup() {
         }
         if (humidity < min_valueU) {
             min_valueU = humidity;
-        }
+        } 
         
         String html = htmlPage;
-        html.replace("%TIMERST%", tims);
-        html.replace("%TEMPERATURA%", String(temperature));
-        html.replace("%TEMP_MAX%", String(max_valueT));
-        html.replace("%TEMP_MIN%", String(min_valueT));
-        html.replace("%UMIDADE%", String(humidity));
-        html.replace("%UMID_MAX%", String(max_valueU));
-        html.replace("%UMID_MIN%", String(min_valueU));
+        html.replace("%TEMPERATURA%", String(temperature, 1));
+        html.replace("%TEMP_MAX%", String(max_valueT, 1));
+        html.replace("%TEMP_MIN%", String(min_valueT, 1));
+        html.replace("%UMIDADE%", String(humidity, 1));
+        html.replace("%HMSOLO%", String(SOhumidity));
         html.replace("%LDR%", String(LDR_V));
-        
-        // Garante que a umidade do solo não exceda 100%
-        if (SOhumidity > 100) {
-            SOhumidity = 100;
+        html.replace("%UMID_MAX%", String(max_valueU, 1));
+        html.replace("%UMID_MIN%", String(min_valueU, 1));
+
+        if (SOhumidity < 30) {
+            html.replace("%HSOLO_STATUS%", "Seco");
+        } else if (SOhumidity >= 30 && SOhumidity < 70) {
+            html.replace("%HSOLO_STATUS%", "Apropriado");
+        } else {
+            html.replace("%HSOLO_STATUS%", "Encharcado");
         }
 
-        if (LDR_V > 100){
-            LDR_V = 100;
+        if (LDR_V < 30) {
+            html.replace("%LDR_STATUS%", "Baixa luminosidade");
+        } else if (LDR_V >= 30 && LDR_V < 70) {
+            html.replace("%LDR_STATUS%", "Luminosidade adequada");
+        } else {
+            html.replace("%LDR_STATUS%", "Luminosidade intensa");
         }
-        
-        html.replace("%HSOLO%", String(SOhumidity));
+
+        html.replace("%TIMERST%", tims);
         server.send(200, "text/html", html);
     });
 
-    server.on("/data", HTTP_GET, []() {
-        float temperature = dht.readTemperature();
-        float humidity = dht.readHumidity();
-        int SOhumidity = analogRead(HMSOLO);
-        SOhumidity = map(SOhumidity, 0, 4095, 0, 100);
-        int LDR_V = analogRead(LDR);
-        LDR_V = map(LDR_V, 0, 1023, 0, 100);
+   server.on("/data", HTTP_GET, []() {
+    float temperature = dht.readTemperature();
+    float humidity = dht.readHumidity();
+    int SOhumidity = analogRead(HMSOLO);
+    SOhumidity = map(SOhumidity, 0, 4095, 100, 0); 
+    int LDR_V = analogRead(LDR);
+    LDR_V = map(LDR_V, 0, 4095, 0, 100);
 
-        if (isnan(temperature) || isnan(humidity) || isnan(SOhumidity) || isnan(LDR_V)) {
-            temperature = 0.0;
-            humidity = 0.0;
-            SOhumidity = 0;
-            LDR_V = 0;
-        }
-        
-        // Atualiza valores máximos e mínimos
-        if (temperature > max_valueT) {
-            max_valueT = temperature;
-        }
-        if (temperature < min_valueT) {
-            min_valueT = temperature;
-        }
-        if (humidity > max_valueU) {
-            max_valueU = humidity;
-        }
-        if (humidity < min_valueU) {
-            min_valueU = humidity;
-        }
-        
-        String json = "{\"temperature\": " + String(temperature) + ", \"humidity\": " + String(humidity) + ", \"temp_max\": " + String(max_valueT) + ", \"temp_min\": " + String(min_valueT) + ", \"hum_max\": " + String(max_valueU) + ", \"hum_min\": " + String(min_valueU) + ", \"HMSOLO\": " + String(SOhumidity) + ", \"HMAX\": " + String(max_valueHS) + ", \"HMIN\": " + String(min_valueHS) + ", \"LDR\": " + String(LDR_V) + ", \"timerst\": \"" + tims + "\"}";
-        server.send(200, "application/json", json);
-    });
+    if (temperature > max_valueT) {
+        max_valueT = temperature;
+    }
+    if (temperature < min_valueT) {
+        min_valueT = temperature;
+    }
+    if (humidity > max_valueU) {
+        max_valueU = humidity;
+    }
+    if (humidity < min_valueU) {
+        min_valueU = humidity;
+    }
+
+    if (LDR_V > 100) {
+        LDR_V = 100;
+    }
+
+    if (isnan(temperature) || isnan(humidity) || isnan(SOhumidity) || isnan(LDR_V)){
+        temperature = 0.0;
+        humidity = 0.0;
+        SOhumidity = 0;
+        LDR_V = 0;
+    }
+
+    String soilStatus;
+    if (SOhumidity < 30) {
+        soilStatus = "Seco";
+    } else if (SOhumidity >= 30 && SOhumidity < 70) {
+        soilStatus = "Apropriado";
+    } else {
+        soilStatus = "Encharcado";
+    }
+
+    String lightStatus;
+    if (LDR_V < 30) {
+        lightStatus = "Baixa luminosidade";
+    } else if (LDR_V >= 30 && LDR_V < 70) {
+        lightStatus = "Luminosidade adequada";
+    } else {
+        lightStatus = "Luminosidade intensa";
+    }
+
+    String json = "{";
+    json += "\"temperature\":" + String(temperature, 1) + ",";
+    json += "\"humidity\":" + String(humidity, 1) + ",";
+    json += "\"HMSOLO\":" + String(SOhumidity) + ",";
+    json += "\"LDR\":" + String(LDR_V) + ",";
+    json += "\"temp_max\":" + String(max_valueT, 1) + ",";
+    json += "\"temp_min\":" + String(min_valueT, 1) + ",";
+    json += "\"hum_max\":" + String(max_valueU, 1) + ",";
+    json += "\"hum_min\":" + String(min_valueU, 1) + ",";
+    json += "\"HSOLO_STATUS\":\"" + soilStatus + "\",";
+    json += "\"LDR_STATUS\":\"" + lightStatus + "\",";
+    json += "\"timerst\":\"" + tims + "\"";
+    json += "}";
+
+    server.send(200, "application/json", json);
+});
+
 
     server.begin();
-    Serial.println("HTTP server started");
 }
 
 void loop() {
-    server.handleClient();
+    unsigned long currentMillis = millis();
     Serial.available();
 
     float h = dht.readHumidity();
     float t = dht.readTemperature();
     int SOhumidity = analogRead(HMSOLO);
-    SOhumidity = map(SOhumidity, 0, 4095, 0, 100);
     int LDR_V = analogRead(LDR);
-    LDR_V = map(LDR_V, 0, 1023, 0, 100);
-
     if (isnan(h) || isnan(t) || isnan(SOhumidity) || isnan(LDR_V)) {
         Serial.println("Failed to read from sensor!");
         return;
-    } else {
-        Serial.println("Successful to read from sensor!");
     }
+
+    if (currentMillis - tempstart >= interval) {
+        tempstart = currentMillis;
+        seconds++;
+        if (seconds == 60) {
+            seconds = 0;
+            minutes++;
+        }
+        tims = (minutes < 10 ? "0" : "") + String(minutes) + ":" + (seconds < 10 ? "0" : "") + String(seconds);
+    }
+    server.handleClient();
 }
