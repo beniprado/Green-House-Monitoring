@@ -1,4 +1,3 @@
-
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WebServer.h>
@@ -17,28 +16,23 @@ WebServer server(80);
 
 const char *htmlPage = R"rawliteral(
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Green-house Monitoring</title><style>
-body { background-color: #BBE1D6; text-align: center; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; margin: 0; padding: 0 } header { margin-bottom: 10px; padding: 10px; background-color: #74DBBC; color: #315C4F } main { padding: 0 0 80px } h1 { margin: 0; font-size: 2em } div#info { display: flex; padding: 10px; justify-content: space-evenly } .stats { font-weight: 700 } div.divstats { display: flex; flex-direction: column } .container { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; padding: 20px } section { width: 200px; padding: 15px; margin: 10px; border-radius: 10px; background-color: #315C4F; color: #FFF; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform .2s } h2 { font-size: 1.2em; color: #74DBBC; margin-bottom: 10px } p { margin: 5px 0 } footer { padding: 10px; background-color: #315C4F; color: #FFF; position: fixed; bottom: 0; width: 100%; text-align: center } .atual { display: inline-block; padding: 11px; color: #74DBBC; font-weight: 700; border: 2px solid #193029; border-radius: 4px; text-align: center } .Min-Max { font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; font-size: 16px } .divmm { display: flex; flex-direction: row; justify-content: space-around } @media screen and (max-width: 540px) { body { margin: 0 auto; text-align: center } h1#title { font-size: 6.1vw; } .container { padding: 0 } .stats { font-size: 3.0vw; } .statsV { font-size: 2.8vw; } section { margin: 20px auto } footer { position: static; padding: 15px 0 } footer>p { font-size: 13px } }</style>
+body { background-color: #BBE1D6; text-align: center; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; margin: 0; padding: 0 } header { margin-bottom: 10px; padding: 10px; background-color: #74DBBC; color: #315C4F } main { padding: 0 0 80px } h1 { margin: 0; font-size: 2em } div#info { display: flex; padding: 10px; justify-content: space-evenly }.container { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; padding: 20px } section { width: 200px; padding: 15px; margin: 10px; border-radius: 10px; background-color: #315C4F; color: #FFF; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform .2s } h2 { font-size: 1.2em; color: #74DBBC; margin-bottom: 10px } p { margin: 5px 0 } .divstats{display: flex; flex-direction: column;} footer { padding: 10px; background-color: #315C4F; color: #FFF; position: fixed; bottom: 0; width: 100%; text-align: center } .atual { display: inline-block; padding: 11px; color: #74DBBC; font-weight: 700; border: 2px solid #193029; border-radius: 4px; text-align: center } .Min-Max { font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; font-size: 16px } .divmm { display: flex; flex-direction: row; justify-content: space-around } @media screen and (max-width: 540px) { body { margin: 0 auto; text-align: center } h1#title { font-size: 6.1vw; } .container { padding: 0 } .statsV { font-size: 2.8vw; } section { margin: 20px auto } footer { position: static; padding: 15px 0 } footer>p { font-size: 13px } }</style>
 </head>
 <body>
     <header>
         <h1 id="title">Green-house Monitoring</h1>
         <div id="info">
             <div class="divstats">
-                <span id="tempodat" class="stats">Tempo de Atividade</span>
+                <span id="tempodat" class="stats">&#9201;</span>
                 <span id="timerst" class="statsV">%TIMERST%</span>
             </div>
-            <div class="divstats" style="display: none;">
-                <span class="stats">Aviso</span>
-                <span id="notice" class="statsV">%NOTICE%</span>
-            </div>
             <div class="divstats">
-                <span id="Userstitle" class="stats">Usuários Ativo</span>
+                <span id="Userstitle" class="stats">&#x1F464;</span>
                 <span id="users_value" class="statsV">%USERS_ON%</span>
             </div>
         </div>
