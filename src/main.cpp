@@ -68,7 +68,7 @@ body { background-color: #BBE1D6; text-align: center; font-family: 'Lucida Sans'
         </div>
     </main>
     <footer>
-        <p>© 2024 Green-house Monitoring Versão 1.4.2</p>
+        <p>© 2024 Green-house Monitoring Versão 1.4.3</p>
         <code>Feito por <a href="https://www.instagram.com/beni.prado/" style="color: white;" target="_blank">Beni</a></code>
     </footer>
     <script>
