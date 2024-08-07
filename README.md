@@ -36,5 +36,5 @@ Este projeto oferece uma base sólida para o monitoramento de plantas utilizando
 
 ## Recursos Adicionais
 
-- [Site](-------)
-- [Diagrama do Sistema](------)
+- [Site](https://greenhouse-monitoring.netlify.app)
+- [Diagrama do Sistema](https://greenhouse-monitoring.netlify.app/diagrama)
