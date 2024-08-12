@@ -106,11 +106,11 @@ body { background-color: #BBE1D6; text-align: center; font-family: 'Lucida Sans'
 )rawliteral";
 
 float max_valueT = 0.0;
-float min_valueT = 100.0;  // Valor inicial alto para encontrar o mínimo
+float min_valueT = 100.0;
 float max_valueU = 0.0;
-float min_valueU = 100.0;  // Valor inicial alto para encontrar o mínimo
+float min_valueU = 100.0;
 int max_valueHS = 0;
-int min_valueHS = 100;     // Inicializado com 100 para encontrar o mínimo
+int min_valueHS = 100;     
 
 unsigned long tempstart = 0;
 unsigned long interval = 1000;
@@ -135,7 +135,7 @@ void setup() {
         float temperature = dht.readTemperature();
         float humidity = dht.readHumidity();
         int SOhumidity = analogRead(HMSOLO);
-        SOhumidity = map(SOhumidity, 0, 4095, 100, 0); // Corrigido para reverter os valores
+        SOhumidity = map(SOhumidity, 0, 4095, 100, 0);
         int LDR_V = analogRead(LDR);
         LDR_V = map(LDR_V, 0, 4095, 0, 100);
 
@@ -146,7 +146,7 @@ void setup() {
             LDR_V = 0;
         }
         
-        // Atualiza valores máximos e mínimos
+        
         if (temperature > max_valueT) {
             max_valueT = temperature;
         }

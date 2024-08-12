@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-O objetivo deste projeto é desenvolver um sistema IoT para medições precisas de uma planta e exibição dessas informações em um painel web. O sistema permitirá monitorar a umidade do solo, a temperatura e umidade do ambiente, bem como a intensidade da luz, auxiliando no cuidado e manutenção das plantas.
+O objetivo deste projeto é desenvolver um sistema IoT para medir e exibir informações sobre uma planta em um painel web. O sistema permitirá monitorar a umidade do solo, a temperatura e a umidade do ambiente, bem como a intensidade da luz, auxiliando no cuidado e manutenção das plantas.
 
 ## Componentes Utilizados
 
