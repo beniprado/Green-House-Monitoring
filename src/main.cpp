@@ -21,7 +21,7 @@ const char *htmlPage = R"rawliteral(
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Green-house Monitoring</title><style>
-body { background-color: #BBE1D6; text-align: center; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; margin: 0; padding: 0 } header { margin-bottom: 10px; padding: 10px; background-color: #74DBBC; color: #315C4F } main { padding: 0 0 80px } h1 { margin: 0; font-size: 2em } div#info { display: flex; padding: 10px; justify-content: space-evenly }.container { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; padding: 20px } section { width: 225px; padding: 10px; margin: 10px; border-radius: 10px; background-color: #315C4F; color: #FFF; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform .2s } h2 { font-size: 1.2em; color: #74DBBC; margin-bottom: 10px } p { margin: 5px 0 } .divstats{display: flex; flex-direction: column;} footer { padding: 10px; background-color: #315C4F; color: #FFF; position: fixed; bottom: 0; width: 100%; text-align: center } .atual { display: inline-block; padding: 11px; color: #74DBBC; font-weight: 700; border: 2px solid #193029; border-radius: 4px; text-align: center } .Min-Max { font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; font-size: 16px } .divmm { display: flex; flex-direction: row; justify-content: space-around } @media screen and (max-width: 540px) { body { margin: 0 auto; text-align: center } h1#title { font-size: 6.1vw; } .container { padding: 0 } .statsV { font-size: 2.8vw; } section { margin: 20px auto } footer { position: static; padding: 15px 0 } footer>p { font-size: 13px } }</style>
+body { background-color: #BBE1D6; text-align: center; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; margin: 0; padding: 0 } header { margin-bottom: 10px; padding: 10px; background-color: #74DBBC; color: #315C4F } main { padding: 0 0 80px } a{text-decoration: none; background-color: #315C4F; color: #74DBBC; font-family: Arial, Helvetica, sans-serif; padding: 10px; font-size: 1.2em; border-radius: 12px; font-weight: 600;} h1 { margin: 0; font-size: 2em } div#info { display: flex; padding: 10px; justify-content: space-evenly }.container { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; padding: 20px } section { width: 225px; padding: 10px; margin: 10px; border-radius: 10px; background-color: #315C4F; color: #FFF; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform .2s } h2 { font-size: 1.2em; color: #74DBBC; margin-bottom: 10px } p { margin: 5px 0 } .divstats{display: flex; flex-direction: column;} footer { padding: 10px; background-color: #315C4F; color: #FFF; position: fixed; bottom: 0; width: 100%; text-align: center } .atual { display: inline-block; padding: 11px; color: #74DBBC; font-weight: 700; border: 2px solid #193029; border-radius: 4px; text-align: center } .Min-Max { font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; font-size: 16px } .divmm { display: flex; flex-direction: row; justify-content: space-around } @media screen and (max-width: 540px) { body { margin: 0 auto; text-align: center } h1#title { font-size: 6.1vw; } .container { padding: 0 } .statsV { font-size: 2.8vw; } section { margin: 20px auto } footer { position: static; padding: 15px 0 } footer>p { font-size: 13px } }</style>
 </head>
 <body>
     <header>
@@ -66,11 +66,9 @@ body { background-color: #BBE1D6; text-align: center; font-family: 'Lucida Sans'
                 <p id="lumimax">Status: %LDR_STATUS%</p>
             </section>
         </div>
+        <a href="https://greenhouse-monitoring.netlify.app/" target="_blank">Conheça mais</a>
     </main>
-    <footer>
-        <p>© 2024 Green-house Monitoring Versão 1.4.3</p>
-        <code>Feito por <a href="https://www.instagram.com/beni.prado/" style="color: white;" target="_blank">Beni</a></code>
-    </footer>
+    <footer><p>© 2024 Green-house Monitoring Versão 1.5</p></footer>
     <script>
         function atualizarDados() {
             var xhr = new XMLHttpRequest();
@@ -85,9 +83,9 @@ body { background-color: #BBE1D6; text-align: center; font-family: 'Lucida Sans'
                         document.getElementById('umidade_max').textContent = "Max: " + data.hum_max + "%";
                         document.getElementById('umidade_min').textContent = "Min: " + data.hum_min + "%";
                         document.getElementById('soilinfo').textContent = "" + data.HMSOLO + "%";
-                        document.getElementById('soilstatus').textContent = "Status: " + data.HSOLO_STATUS;  // Atualiza o status do solo
+                        document.getElementById('soilstatus').textContent = "Status: " + data.HSOLO_STATUS;
                         document.getElementById('lumiinfo').textContent = "" + data.LDR + "%";
-                        document.getElementById('lumimax').textContent = "Status: " + data.LDR_STATUS;  // Atualiza o status da luminosidade
+                        document.getElementById('lumimax').textContent = "Status: " + data.LDR_STATUS;
                         document.getElementById('users_value').textContent = data.users_value;
                         document.getElementById('timerst').textContent = data.timerst;
                     } else {
