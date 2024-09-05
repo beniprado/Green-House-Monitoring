@@ -103,12 +103,10 @@ body { background-color: #BBE1D6; text-align: center; font-family: 'Lucida Sans'
 </html>
 )rawliteral";
 
-float max_valueT = 0.0;
+float max_valueT = -100.0;  // Ajustado para valores negativos
 float min_valueT = 100.0;
 float max_valueU = 0.0;
 float min_valueU = 100.0;
-int max_valueHS = 0;
-int min_valueHS = 100;     
 
 unsigned long tempstart = 0;
 unsigned long interval = 1000;
@@ -136,28 +134,26 @@ void setup() {
         SOhumidity = map(SOhumidity, 0, 4095, 100, 0);
         int LDR_V = analogRead(LDR);
         LDR_V = map(LDR_V, 0, 4095, 0, 100);
+        
+        // Atualiza valores máximos e mínimos
+        if (!isnan(temperature)) {
+            if (temperature > max_valueT) {
+                max_valueT = temperature;
+            }
+            if (temperature < min_valueT) {
+                min_valueT = temperature;
+            }
+        }
 
-        if (isnan(temperature) || isnan(humidity) || isnan(SOhumidity) || isnan(LDR_V)){
-            temperature = 0.0;
-            humidity = 0.0;
-            SOhumidity = 0;
-            LDR_V = 0;
+        if (!isnan(humidity)) {
+            if (humidity > max_valueU) {
+                max_valueU = humidity;
+            }
+            if (humidity < min_valueU) {
+                min_valueU = humidity;
+            }
         }
-        
-        
-        if (temperature > max_valueT) {
-            max_valueT = temperature;
-        }
-        if (temperature < min_valueT) {
-            min_valueT = temperature;
-        }
-        if (humidity > max_valueU) {
-            max_valueU = humidity;
-        }
-        if (humidity < min_valueU) {
-            min_valueU = humidity;
-        } 
-        
+
         String html = htmlPage;
         html.replace("%TEMPERATURA%", String(temperature, 1));
         html.replace("%TEMP_MAX%", String(max_valueT, 1));
@@ -197,82 +193,47 @@ void setup() {
     int LDR_V = analogRead(LDR);
     LDR_V = map(LDR_V, 0, 4095, 0, 100);
 
-    if (temperature > max_valueT) {
-        max_valueT = temperature;
-    }
-    if (temperature < min_valueT) {
-        min_valueT = temperature;
-    }
-    if (humidity > max_valueU) {
-        max_valueU = humidity;
-    }
-    if (humidity < min_valueU) {
-        min_valueU = humidity;
+    String tempStr = isnan(temperature) ? "N/A" : String(temperature, 1);
+    String humStr = isnan(humidity) ? "N/A" : String(humidity, 1);
+    String soilStr = isnan(SOhumidity) ? "N/A" : String(SOhumidity);
+    String ldrStr = isnan(LDR_V) ? "N/A" : String(LDR_V);
+
+    if (!isnan(temperature)) {
+        if (temperature > max_valueT) max_valueT = temperature;
+        if (temperature < min_valueT) min_valueT = temperature;
     }
 
-    if (LDR_V > 100) {
-        LDR_V = 100;
+    if (!isnan(humidity)) {
+        if (humidity > max_valueU) max_valueU = humidity;
+        if (humidity < min_valueU) min_valueU = humidity;
     }
 
-    if (isnan(temperature) || isnan(humidity) || isnan(SOhumidity) || isnan(LDR_V)){
-        temperature = 0.0;
-        humidity = 0.0;
-        SOhumidity = 0;
-        LDR_V = 0;
-    }
-
-    String soilStatus;
-    if (SOhumidity < 30) {
-        soilStatus = "Seco";
-    } else if (SOhumidity >= 30 && SOhumidity < 70) {
-        soilStatus = "Apropriado";
-    } else {
-        soilStatus = "Encharcado";
-    }
-
-    String lightStatus;
-    if (LDR_V < 30) {
-        lightStatus = "Baixa luminosidade";
-    } else if (LDR_V >= 30 && LDR_V < 70) {
-        lightStatus = "Luminosidade adequada";
-    } else {
-        lightStatus = "Luminosidade intensa";
-    }
+    String soilStatus = (soilStr == "N/A") ? "N/A" : (SOhumidity < 30) ? "Seco" : (SOhumidity < 70) ? "Apropriado" : "Encharcado";
+    String lightStatus = (ldrStr == "N/A") ? "N/A" : (LDR_V < 30) ? "Baixa luminosidade" : (LDR_V < 70) ? "Luminosidade adequada" : "Luminosidade intensa";
 
     String json = "{";
-    json += "\"temperature\":" + String(temperature, 1) + ",";
-    json += "\"humidity\":" + String(humidity, 1) + ",";
-    json += "\"HMSOLO\":" + String(SOhumidity) + ",";
-    json += "\"LDR\":" + String(LDR_V) + ",";
-    json += "\"temp_max\":" + String(max_valueT, 1) + ",";
-    json += "\"temp_min\":" + String(min_valueT, 1) + ",";
-    json += "\"hum_max\":" + String(max_valueU, 1) + ",";
-    json += "\"hum_min\":" + String(min_valueU, 1) + ",";
+    json += "\"temperature\":\"" + tempStr + "\",";
+    json += "\"humidity\":\"" + humStr + "\",";
+    json += "\"HMSOLO\":\"" + soilStr + "\",";
+    json += "\"LDR\":\"" + ldrStr + "\",";
+    json += "\"temp_max\":\"" + (isnan(max_valueT) ? "N/A" : String(max_valueT, 1)) + "\",";
+    json += "\"temp_min\":\"" + (isnan(min_valueT) ? "N/A" : String(min_valueT, 1)) + "\",";
+    json += "\"hum_max\":\"" + (isnan(max_valueU) ? "N/A" : String(max_valueU, 1)) + "\",";
+    json += "\"hum_min\":\"" + (isnan(min_valueU) ? "N/A" : String(min_valueU, 1)) + "\",";
     json += "\"HSOLO_STATUS\":\"" + soilStatus + "\",";
     json += "\"LDR_STATUS\":\"" + lightStatus + "\",";
-    json += "\"users_value\":\""  + String(users) + "\",";
+    json += "\"users_value\":\"" + String(users) + "\",";
     json += "\"timerst\":\"" + tims + "\"";
     json += "}";
 
     server.send(200, "application/json", json);
 });
-
     server.begin();
 }
 
 void loop() {
     unsigned long currentMillis = millis();
-    Serial.available();
     users = WiFi.softAPgetStationNum();
-
-    float h = dht.readHumidity();
-    float t = dht.readTemperature();
-    int SOhumidity = analogRead(HMSOLO);
-    int LDR_V = analogRead(LDR);
-    if (isnan(h) || isnan(t) || isnan(SOhumidity) || isnan(LDR_V)) {
-        Serial.println("Failed to read from sensor!");
-        return;
-    }
 
     if (currentMillis - tempstart >= interval) {
         tempstart = currentMillis;
